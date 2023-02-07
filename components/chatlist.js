@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {useNavigation} from '@react-navigation/native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect,useContext} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {Divider} from 'react-native-paper';
 import {Tab, TabView, Badge} from '@rneui/themed';
-import webSocket from '../socketServices/webSocket';
+import webSocket,{messageService} from '../socketServices/webSocket';
 import {
   Menu,
   MenuProvider,
@@ -19,14 +19,43 @@ import {
   MenuOption,
   MenuTrigger,
  } from 'react-native-popup-menu';
+ import { AppContext } from './context';
+ import { IndividualChat } from './individualchat';
+//  import webSocket, { messageService ,subUser} from '../socketServices/webSocket';
+import {useContextHelper} from './utilities/utility_variable'
+import {fetchChatData1} from "./services/api_services";
 
 const ChatContext = React.createContext();
+
+
 
 const AllChatList = () => {
   const [chatList, setChatList] = useState([]);
   const [index, setIndex] = useState(0);
   const navigation = useNavigation();
   const [chatmessages, setchatmessages] = useState([]);
+  const [chatUsers, setChatUsers] = useState([]);
+
+  const msgEvent=new useContextHelper();
+  console.log("msgEvent",msgEvent);
+  //  const { dispatchMessageEvent } = useContext(MessageContext);
+  // const { dispatchMessageEvent } = useContext(MessageContext);
+
+
+  const dispatchUserEvent = (actionType, payload) => {
+		switch (actionType) {
+			case 'ADD_USER':
+				setChatUsers([ ...chatUsers, payload.newUser ]);
+				return;
+			case 'REMOVE_USER':
+				setChatUsers(chatUsers.filter(user => user.id !== payload.userId));
+				return;
+			default:
+				return;
+		}
+	};
+
+  
 
   const handleBack = () => {
     navigation.navigate('IndividualChat');
@@ -41,42 +70,49 @@ const AllChatList = () => {
     });
   },[]);
 
-  useEffect(() => {
-    const myHeaders = new Headers();
-    myHeaders.append('Content-Type', 'application/json');
-    myHeaders.append(
-      'authentication-token',
-      '0mWeYtGs9FZIG1aWK7/oU2E6ixO57tB40fldoHyu41YfXZJCEMLuKFgxM9RtZPcl',
-    );
+  useEffect(()=>{
 
-    async function fetchChatData1() {
-      const allchats = await fetch(
-        'https://aim.twixor.com/e/enterprise/chat/summary',
-        {crossDomain: true, headers: myHeaders},
-      );
-      const allchatsdata = await allchats.json();
-      setchatmessages(allchatsdata.response.chats);
+     messageService.getMessage().subscribe((data)=>{
+    var obj = JSON.parse(data);
+    console.log('individualdata',obj);
+    if (obj.action == 'agentReplyChat'){
+      console.log(obj.content[0].response.chat.messages[0]);
+      var msg = obj.content[0].response.chat.messages[0];
+
+      // console.log("First",messages.length);
+      const messages1 = [];
+      messages1.push(msg);
+      //  messages.push(msg);
+      // setUpdateMessages(messages);
+
+
+      // dispatchMessageEvent('ADD_MESSAGE', { message:msg });
+        console.log('Second',messages1.length);
     }
+    });
+  });
 
-    fetchChatData1();
+  useEffect(() => {
+    
+
+   
+    setchatmessages(fetchChatData1())
+    
   }, []);
 
   const Header = () => (
-    
-    <MenuProvider customStyles={{menuProviderWrapper:{flexDirection: 'column'},backdrop: {
-      backgroundColor: '#217eac',
-      opacity: 0.5,
-    }}}>
-     
+
+
+
     <View style={styles.navBar}>
     <View style={styles.leftSection}>
       <Image
-        source={require("../assets/twixor_hd_icon.png")}
+        source={require('../assets/twixor_hd_icon.png')}
         style={styles.icon}
       />
       <Text style={styles.label}>Chats</Text>
       <Image
-        source={require("../assets/online_26.png")}
+        source={require('../assets/online_26.png')}
         style={styles.icon1}
       />
       <Text style={styles.label1}>Online</Text>
@@ -87,27 +123,27 @@ const AllChatList = () => {
           value="9"
           status="error"
           containerStyle={{
-            position: "absolute",
+            position: 'absolute',
             top: 10,
             right: 1,
             zIndex: 1,
           }}
-          textStyle={{ color: "white" }}
-          badgeStyle={{ backgroundColor: "red" }}
+          textStyle={{ color: 'white' }}
+          badgeStyle={{ backgroundColor: 'red' }}
         >
-          <Image source={require("../assets/search_64.png")} />
+          <Image source={require('../assets/search_64.png')} />
         </Badge>
         <Image
-          source={require("../assets/notification_64.png")}
+          source={require('../assets/notification_64.png')}
           style={styles.icon}
         />
         </TouchableOpacity>
-        
-        
-      
+
+
+
              <View style={{marginLeft:180}}>
-             
-           
+
+
      <Menu style={{position:'absolute',top:0,right:0}}>
      <MenuTrigger  >
            <Image
@@ -117,23 +153,23 @@ const AllChatList = () => {
            />
            </MenuTrigger>
      <MenuOptions optionsContainerStyle=
-   {{paddingLeft:8,height:96,width:100}}>
+   {{paddingLeft:8,height:120,width:200}}>
 
-       <MenuOption onSelect={() => alert('No New chats')} text="New Chats" /><MenuOption onSelect={() => alert('No Transferred Chats')} disabled={true}>
+       <MenuOption onSelect={() => alert('No New chats')} text="New Chats - {0}" /><MenuOption onSelect={() => alert('No Transferred Chats')} disabled={true}>
        <Text style={{ color: 'red' }}>Transferred Chat</Text>
      </MenuOption>
      <MenuOption onSelect={() => alert('Invited Chat')} disabled={true} text="Invited Chat" />
      </MenuOptions>
      </Menu>
-     
+
 
           </View>
-          
+
     </View>
   </View>
-  
-  </MenuProvider>
-  
+
+
+
 
     //<View style={styles.navBar}>
     //   <View style={styles.leftSection}>
@@ -361,9 +397,17 @@ const AllChatList = () => {
 
   return (
     <>
+    <AppContext.Provider value={{ chatUsers, dispatchUserEvent }}>
+
+    <MenuProvider customStyles={{menuProviderWrapper:{flexDirection: 'column'},backdrop: {
+      backgroundColor: '#217eac',
+      opacity: 0.5,
+    }}}>
       <Header />
       <Tabs />
       <ShowChatList />
+      </MenuProvider>
+      </AppContext.Provider>
     </>
   );
 };

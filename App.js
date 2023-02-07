@@ -1,16 +1,21 @@
 import * as React from 'react';
+import {useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Config from 'react-native-config';
-import {} from './socketServices/socket';
+
 import RootNavigation from './navigation/RootNavigation';
 import AllChatList from './components/chatlist';
 import Login from './screens/LoginScreen';
 import IndividualChat from './components/individualchat';
 
+import GlobalUserModel from './components/utilities/utility_variable';
+
+import useContextHelper from './components/utilities/utility_variable';
 const App = () => {
   // console.log(Config);
   // ws.onopen();
+  // useContextHelper();
   return (
     // <NavigationContainer>
     //   <RootNavigation />

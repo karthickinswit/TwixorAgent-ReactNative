@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState,useContext} from 'react';
 import { ScrollView } from 'react-native';
 import {
   View,
@@ -17,7 +17,12 @@ import {
 // import {CloseOutlined} from '@ant-design/icons';
 // import * as ImagePicker from 'expo-image-picker';
 import webSocket, { messageService ,subUser} from '../socketServices/webSocket';
-const IndividualChat = ({route,props}) => {
+import { AppContext } from './context';
+
+ 
+
+export const IndividualChat = ({route,props}) => {
+  // const { users } = useContext(AppContext);
   let messageRef = useRef(null);
   let navigation = useNavigation();
   let textMessage = '';
@@ -31,33 +36,34 @@ const IndividualChat = ({route,props}) => {
   let milliseconds = new Date().getTime();
   let timestamp = new Date('2011-04-20T09:30:51.01');
   
-  messageService.getMessage().subscribe((data)=>{
-    var obj = JSON.parse(data);
-    console.log('individualdata',obj);
-    if (obj.action == 'agentReplyChat'){
-      console.log(obj.content[0].response.chat.messages[0]);
-      var msg=obj.content[0].response.chat.messages[0];
+  // messageService.getMessage().subscribe((data)=>{
+  //   var obj = JSON.parse(data);
+  //   console.log('individualdata',obj);
+  //   if (obj.action == 'agentReplyChat'){
+  //     console.log(obj.content[0].response.chat.messages[0]);
+  //     var msg=obj.content[0].response.chat.messages[0];
       
-      console.log("First",messages.length);
-      const messages1=[...messages];
-      messages1.push(msg);
-      //  messages.push(msg);
-      // setUpdateMessages(messages);
+  //     console.log("First",messages.length);
+  //     const messages1=[...messages];
+  //     messages1.push(msg);
+  //     dispatchMessageEvent('ADD_MESSAGE', { message:msg });
+  //     //  messages.push(msg);
+  //     // setUpdateMessages(messages);
       
       
-        setUpdateMessages(messages1);
-        console.log("Second",messages1.length);
+  //       // setUpdateMessages(messages1);
+  //       console.log("Second",messages1.length);
       
-      // clearInterval(toggle);
+  //     // clearInterval(toggle);
       
-      //  updateMessages(messages);
-      // useRef(messages);
-    // console.log();
-    // messages.push(data.content[0].response.chat.messages[0]);
-    // console.log(messages);
-  }
+  //     //  updateMessages(messages);
+  //     // useRef(messages);
+  //   // console.log();
+  //   // messages.push(data.content[0].response.chat.messages[0]);
+  //   // console.log(messages);
+  // }
 
-  });
+  // });
 
 
 
@@ -65,11 +71,26 @@ const IndividualChat = ({route,props}) => {
   const [currentUser] = useState(agent);
   const [visible, setVisible] = useState(false);
   const [sendmessage, setsendmessage] = useState('');
-  let [messages,setUpdateMessages] = useState( messagesRoute);
+   let [messages,setUpdateMessages] = useState( messagesRoute);
   const [image, sendimage] = useState('');
   const [count, setCount] = useState(0);
   // updateMessages(individualdata.chat.messages);
   // messages = individualdata.chat.messages;
+
+
+  const dispatchMessageEvent = (actionType, payload) => {
+		switch (actionType) {
+			case 'ADD_MESSAGE':
+        console.log("dispatched",payload.message)
+				setUpdateMessages([ ...messages, payload.message ]);
+				return;
+			case 'REMOVE_USER':
+				setUpdateMessages(messages.filter(message => message.id !== payload.userId));
+				return;
+			default:
+				return;
+		}
+	};
 
   const selectImageFromFile = async () => {
     // try {
@@ -199,15 +220,12 @@ const IndividualChat = ({route,props}) => {
         <View style={styles.left}>
           <TouchableOpacity onPress={goBack} style={styles.left}>
           <Image
-        source={require('../assets/boy_dummy.png')}
-        style={styles.closeIcon}
+        source={require('../assets/chevron-left-solid.png')}
+        style={{   width: 30,
+    height: 30,
+    color: '#217eac',borderRadius:30}}
       />
-            <Icon
-              name="heart"
-              size={40}
-              color="#217eac"
-              style={{marginLeft: -10, marginRight: 10}}
-            />
+            {/* <Icon size={24} color="red" name="movie" /> */}
             {/* <Icon name="rocket" size={30} color="#900" /> */}
             {/* <Icon name="md-arrow-round-back" size={16} color="#000" /> */}
         {/* <Text style={styles.label}> Chats </Text> */}
@@ -217,6 +235,13 @@ const IndividualChat = ({route,props}) => {
             source={{uri: 'https://randomuser.me/api/portraits/men/1.jpg'}}
             style={{width: 60, height: 60}}
           /> */}
+          <View style={styles.headerContainer}>
+          <Image
+        source={require('../assets/boy_dummy.png')}
+        style={{   width: 50,
+    height: 50,
+    color: '#217eac',borderRadius:30}}
+      />
           <View style={styles.textContainer}>
             <View>
               <Text style={styles.title}>
@@ -240,13 +265,16 @@ const IndividualChat = ({route,props}) => {
         </View>
       </View>
       <Popver />
+      </View>
     </>
   );
 
   const ChatBody = () => (
     <><ScrollView>
       <View style={styles.bodyContainer}>
-     { }
+     {
+      
+      }
         {messages.map((message, index) => (
           <View
             key={index}
@@ -309,12 +337,15 @@ const IndividualChat = ({route,props}) => {
   //  messages = individualdata.chat.messages;
    
   return (
+    <AppContext.Provider value={{ messages, dispatchMessageEvent }}>
+     {/* <useContextHelper /> */}
     <View style={styles.chatContainer}>
       <ChatHeader />
       <ChatBody />
       <BottomSheet />
       <ChatFooter />
     </View>
+    </AppContext.Provider>
   );
 };
 
@@ -349,6 +380,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
+    flex:1
   },
   headerText: {
     fontSize: 16,

@@ -1,7 +1,6 @@
 {
   "name": "twixorAgentApp",
   "version": "0.0.1",
-  "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -16,7 +15,6 @@
     "android:prod-release": "react-native run-android --variant=productionrelease"
   },
   "dependencies": {
-    
     "@fontsource/roboto": "^4.5.8",
     "@react-navigation/native": "^6.1.1",
     "@react-navigation/native-stack": "^6.9.7",
@@ -30,6 +28,7 @@
     "react-native-popup-menu": "^0.16.1",
     "react-native-safe-area-context": "^4.4.1",
     "react-native-screens": "^3.18.2",
+    "react-native-svg": "^13.8.0",
     "react-native-vector-icons": "^9.2.0",
     "rxjs": "^7.8.0"
   },
