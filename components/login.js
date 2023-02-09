@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import {useNavigation} from '@react-navigation/native';
-import React, {useState} from 'react';
+
+import React from 'react';
 import {
   View,
   Text,
@@ -11,29 +11,32 @@ import {
 } from 'react-native';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailerror, setemailerror] = useState('');
-  const [passowrderror, setpassworderror] = useState('');
-
+  // const [username, setUsername] = useState('');
+  // const [password, setPassword] = useState('');
+  // const [emailerror, setemailerror] = useState('');
+  // const [passowrderror, setpassworderror] = useState('');
+  let username = "";
+  let password = "";
+  let emailerror = "";
+  let passowrderror = "";
   const validateEmail = username => {
     const regex =
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return regex.test(username.toLowerCase());
   };
 
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   const handleLogin = () => {
-    if ((!validateEmail(username) && password.length < 8) || username == '') {
-      setemailerror('Please Provide a Valid Email Address');
-      setpassworderror('Password Should not be Empty');
-    } else if (password.length < 8) {
-      setpassworderror('Password Should not be Empty');
-    } else {
-      console.log([username, password]);
-      navigation.navigate('AllChatList');
-    }
+    // if ((!validateEmail(username) && password.length < 8) || username == '') {
+    //   setemailerror('Please Provide a Valid Email Address');
+    //   setpassworderror('Password Should not be Empty');
+    // } else if (password.length < 8) {
+    //   setpassworderror('Password Should not be Empty');
+    // } else {
+    //   console.log([username, password]);
+    //   navigation.navigate('AllChatList');
+    // }
   };
 
   const handleForgotPassword = () => {
@@ -46,16 +49,16 @@ const LoginPage = () => {
       <TextInput
         style={styles.input}
         placeholder="User Id"
-        onChangeText={setUsername}
-        value={username}
+        // onChangeText={}
+        // value={}
       />
       {emailerror && <p>{emailerror}</p>}
       <TextInput
         style={styles.input}
         placeholder="Password"
         secureTextEntry={true}
-        onChangeText={setPassword}
-        value={password}
+        // onChangeText={setPassword}
+        // value={password}
       />
       {passowrderror && <p>{passowrderror}</p>}
       <TouchableOpacity style={styles.button} onPress={handleLogin}>

@@ -1,17 +1,28 @@
 /* eslint-disable prettier/prettier */
-import AgentApp from "./agentApp";
+import * as React from 'react';
+import {useState} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import Config from 'react-native-config';
 
+import RootNavigation from './navigation/RootNavigation';
+import AllChatList from './components/chatlist';
+import Login from './screens/LoginScreen';
+import IndividualChat from './components/individualchat';
 
+import GlobalUserModel from './components/utilities/utility_variable';
 
-const App = () => {
+import useContextHelper from './components/utilities/utility_variable';
+import LoginPage from './components/login';
+const AgentApp = () => {
   // console.log(Config);
   // ws.onopen();
   // useContextHelper();
   return (
-    <AgentApp />
     // <NavigationContainer>
     //   <RootNavigation />
     // </NavigationContainer>
+    <LoginPage />
     // <NavigationContainer>
     //   <Stack.Navigator>
     //     <Stack.Screen
@@ -43,9 +54,9 @@ const App = () => {
   );
 };
 
-export default App;
+export default AgentApp;
 
-
+const Stack = createNativeStackNavigator();
 // const HomeScreen = ({navigation}) => {
 //   return (
 //     <Button
